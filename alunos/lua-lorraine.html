@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal · Lua Lorraine</title>
+<style>
+  :root {
+    --primary: #6C63FF;
+    --primary-light: #EEF0FF;
+    --green: #43C59E;
+    --green-light: #E6FAF4;
+    --yellow-light: #FFF6E5;
+    --yellow-text: #854F0B;
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --text: #1E1E2D;
+    --muted: #8F90A6;
+    --border: #E8E9F0;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(108,99,255,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .top-bar { background: var(--primary); padding: 22px 24px; color: #fff; display: flex; align-items: center; gap: 14px; }
+  .avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 700; flex-shrink: 0; }
+  .top-bar h1 { font-size: 1.15rem; font-weight: 700; }
+  .top-bar p { font-size: 0.8rem; opacity: 0.85; margin-top: 3px; }
+  .logo-text { margin-left: auto; font-size: 0.72rem; opacity: 0.7; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+  .content { max-width: 700px; margin: 0 auto; padding: 28px 20px 60px; }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .tag { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .tag-purple { background: var(--primary-light); color: var(--primary); }
+  .tag-green  { background: var(--green-light); color: #0F6E56; }
+  .tag-yellow { background: var(--yellow-light); color: var(--yellow-text); }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .item { background: var(--card); border-radius: 12px; border: 1.5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--text); transition: border-color 0.18s, box-shadow 0.18s; }
+  .item:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+  .item-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .item-icon.green  { background: var(--green-light); }
+  .item-icon.yellow { background: var(--yellow-light); }
+  .item-info { flex: 1; }
+  .item-name { font-size: 0.9rem; font-weight: 600; margin: 0 0 3px; }
+  .item-sub  { font-size: 0.75rem; color: var(--muted); margin: 0; }
+  .badge { font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 10px; white-space: nowrap; }
+  .badge-new  { background: var(--primary-light); color: var(--primary); }
+  .badge-done { background: var(--green-light); color: #0F6E56; }
+  .arrow { color: var(--muted); font-size: 1.1rem; font-weight: 300; flex-shrink: 0; }
+  .empty { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 20px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 40px; }
+</style>
+</head>
+<body>
+<script>
+  const ALUNO = {
+    nome:    "Lua Lorraine",
+    iniciais:"LU",
+    nivel:   "B2 · Intermediário",
+    dia_hora:"Flexivel",
+    desde:   "Fev 2026"
+  };
+
+  const PLANOS = [
+    // { mes: "Julho 2025", data_envio: "01/07/2025", semanas: 4, status: "novo", link: "planos/julho-2025.html" },
+  ];
+
+  const AULAS_AO_VIVO = [
+    // { data: "01/07/2025", tema: "Apresentações em inglês", tipo: "pdf", link: "aulas/aula-01jul2025.pdf" },
+  ];
+
+  const MATERIAIS = [
+    // { nome: "Lista de vocabulário", tipo: "pdf", enviado: "01/07/2025", link: "materiais/vocab.pdf" },
+  ];
+</script>
+<div class="top-bar">
+  <div class="avatar" id="avatar"></div>
+  <div><h1 id="nome-aluno"></h1><p id="subtitulo"></p></div>
+  <span class="logo-text">Karol English</span>
+</div>
+<div class="content">
+  <div class="tags">
+    <span class="tag tag-purple" id="tag-desde"></span>
+    <span class="tag tag-green"  id="tag-nivel"></span>
+    <span class="tag tag-yellow" id="tag-aula"></span>
+  </div>
+  <div class="section">
+    <div class="section-title">📅 Planos de Estudo Mensais</div>
+    <div id="lista-planos"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🎥 Material das Aulas ao Vivo</div>
+    <div id="lista-aulas"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">📎 Materiais de Apoio</div>
+    <div id="lista-materiais"></div>
+  </div>
+  <footer id="footer"></footer>
+</div>
+<script>
+  const ICONES_TIPO = { pdf:"📄", audio:"🎧", exercicio:"📝", link:"🔗", slides:"📊" };
+  document.getElementById("avatar").textContent     = ALUNO.iniciais;
+  document.getElementById("nome-aluno").textContent = ALUNO.nome;
+  document.getElementById("subtitulo").textContent  = "Portal de Estudos · " + ALUNO.nivel;
+  document.getElementById("tag-desde").textContent  = "Desde " + ALUNO.desde;
+  document.getElementById("tag-nivel").textContent  = ALUNO.nivel;
+  document.getElementById("tag-aula").textContent   = "Aulas · " + ALUNO.dia_hora;
+  document.title = "Portal · " + ALUNO.nome;
+  const listaPl = document.getElementById("lista-planos");
+  PLANOS.length === 0 ? listaPl.innerHTML = '<p class="empty">Nenhum plano adicionado ainda.</p>' :
+    PLANOS.forEach(p => { const bc = p.status==="novo"?"badge-new":"badge-done", bl = p.status==="novo"?"Novo":p.status==="andamento"?"Em andamento":"Concluído"; listaPl.innerHTML += `<a class="item" href="${p.link}"><div class="item-icon">📅</div><div class="item-info"><p class="item-name">${p.mes}</p><p class="item-sub">Enviado em ${p.data_envio} · ${p.semanas} semanas</p></div><span class="badge ${bc}">${bl}</span><span class="arrow">›</span></a>`; });
+  const listaAulas = document.getElementById("lista-aulas");
+  AULAS_AO_VIVO.length === 0 ? listaAulas.innerHTML = '<p class="empty">Nenhuma aula registrada ainda.</p>' :
+    AULAS_AO_VIVO.forEach(a => { listaAulas.innerHTML += `<a class="item" href="${a.link}" target="_blank" rel="noopener"><div class="item-icon yellow">${ICONES_TIPO[a.tipo]||"🎥"}</div><div class="item-info"><p class="item-name">${a.tema}</p><p class="item-sub">Aula em ${a.data} · ${a.tipo.toUpperCase()}</p></div><span class="arrow">›</span></a>`; });
+  const listaMat = document.getElementById("lista-materiais");
+  MATERIAIS.length === 0 ? listaMat.innerHTML = '<p class="empty">Nenhum material adicionado ainda.</p>' :
+    MATERIAIS.forEach(m => { listaMat.innerHTML += `<a class="item" href="${m.link}" target="_blank" rel="noopener"><div class="item-icon green">${ICONES_TIPO[m.tipo]||"📎"}</div><div class="item-info"><p class="item-name">${m.nome}</p><p class="item-sub">${m.tipo.toUpperCase()} · Enviado em ${m.enviado}</p></div><span class="arrow">›</span></a>`; });
+  document.getElementById("footer").textContent = "Atualizado em " + new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
+</script>
+</body>
+</html>
