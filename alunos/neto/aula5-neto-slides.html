@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 5 — Descrevendo Processos | Neto</title>
+<style>
+  :root {
+    --verde: #1F4D3A;
+    --bege: #FDEFDB;
+    --dourado: #DAA520;
+    --vermelho: #B23A3A;
+    --bege2: #E8DCCB;
+    --cinza: #333;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #111; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  .deck { flex: 1; position: relative; overflow: hidden; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 34px 48px; text-align: center; }
+  .slide.active { display: flex; }
+  .slide-dark { background: var(--verde); color: var(--bege); }
+  .slide-light { background: var(--bege); color: var(--cinza); }
+  .slide-gold { background: linear-gradient(135deg, #0d2b1e 0%, var(--verde) 100%); color: var(--bege); }
+  .slide-mid { background: #162e22; color: var(--bege); }
+
+  .brand-tag { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--dourado); margin-bottom: 10px; }
+  .slide-number { font-size: 11px; opacity: .4; position: absolute; top: 18px; right: 24px; }
+  h1 { font-family: Georgia, serif; font-size: clamp(24px, 4vw, 44px); font-weight: 700; line-height: 1.15; margin-bottom: 12px; }
+  h2 { font-family: Georgia, serif; font-size: clamp(17px, 2.7vw, 31px); font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+  h3 { font-family: Georgia, serif; font-size: clamp(13px, 1.7vw, 19px); font-weight: 600; margin-bottom: 10px; }
+  .gold-line { width: 50px; height: 2px; background: var(--dourado); border-radius: 2px; margin: 10px auto; }
+  .subtitle { font-size: clamp(12px, 1.4vw, 16px); opacity: .72; line-height: 1.5; }
+  .ctag { font-size: 11px; background: rgba(218,165,32,.12); border: 1px solid var(--dourado); color: var(--dourado); padding: 4px 14px; border-radius: 20px; margin-bottom: 14px; display: inline-block; }
+
+  /* OBJ LIST */
+  .obj-list { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 580px; text-align: left; }
+  .obj-item { display: flex; align-items: flex-start; gap: 12px; background: rgba(255,255,255,.07); border-radius: 12px; padding: 11px 16px; border-left: 3px solid var(--dourado); }
+  .obj-text { font-size: 14px; line-height: 1.5; }
+  .obj-text strong { color: var(--dourado); }
+
+  /* SEQUENCE STEPS */
+  .seq-chain { display: flex; flex-direction: column; gap: 0; width: 100%; max-width: 640px; }
+  .seq-item { display: flex; gap: 14px; align-items: stretch; }
+  .seq-left { display: flex; flex-direction: column; align-items: center; width: 44px; flex-shrink: 0; }
+  .seq-dot { width: 44px; height: 44px; border-radius: 50%; background: var(--dourado); color: var(--verde); font-family: Georgia, serif; font-size: 15px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .seq-line { width: 2px; flex: 1; background: rgba(218,165,32,.3); margin: 4px 0; min-height: 16px; }
+  .seq-content { flex: 1; padding-bottom: 14px; text-align: left; }
+  .seq-word { font-family: Georgia, serif; font-size: 22px; font-weight: 900; color: var(--dourado); line-height: 1; }
+  .seq-pron { font-size: 11px; color: rgba(218,165,32,.65); font-style: italic; margin: 2px 0 4px; }
+  .seq-meaning { font-size: 12px; color: rgba(253,239,219,.55); margin-bottom: 6px; }
+  .seq-ex { font-size: 13px; color: var(--bege); background: rgba(255,255,255,.06); border-radius: 8px; padding: 8px 12px; line-height: 1.5; }
+  .seq-ex strong { color: var(--dourado); }
+
+  /* PROCESS CARD */
+  .process-card { background: rgba(255,255,255,.07); border: 2px solid var(--dourado); border-radius: 18px; padding: 20px 24px; width: 100%; max-width: 680px; text-align: left; }
+  .process-card .pc-tag { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dourado); margin-bottom: 10px; }
+  .process-card .pc-title { font-family: Georgia, serif; font-size: clamp(14px, 1.8vw, 19px); color: #fff; font-weight: 700; margin-bottom: 14px; }
+  .pc-steps { display: flex; flex-direction: column; gap: 8px; }
+  .pc-step { display: flex; gap: 10px; align-items: flex-start; }
+  .pc-num { background: var(--dourado); color: var(--verde); width: 24px; height: 24px; border-radius: 50%; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .pc-text { font-size: 13px; color: var(--bege); line-height: 1.5; flex: 1; }
+  .pc-text .seq { color: var(--dourado); font-weight: 700; }
+  .pc-text .pron { font-size: 11px; color: rgba(218,165,32,.6); font-style: italic; display: block; }
+
+  /* DRILL DARK */
+  .drill-dark { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 680px; }
+  .dd-item { background: rgba(255,255,255,.06); border-radius: 12px; padding: 13px 16px; cursor: pointer; border: 1.5px solid rgba(218,165,32,.2); text-align: left; transition: background .2s; }
+  .dd-item:hover { background: rgba(255,255,255,.1); }
+  .dd-item .dd-q { font-size: 13px; color: var(--bege); font-weight: 600; margin-bottom: 4px; }
+  .dd-item .dd-q span { color: var(--dourado); }
+  .dd-item .dd-a { display: none; font-size: 13px; background: rgba(218,165,32,.1); border-left: 3px solid var(--dourado); border-radius: 6px; padding: 8px 12px; color: var(--bege); line-height: 1.6; margin-top: 6px; }
+  .dd-item.revealed .dd-a { display: block; }
+  .dd-item .dd-hint { font-size: 10px; opacity: .35; margin-top: 3px; }
+
+  /* DRILL LIGHT */
+  .drill-light { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 680px; }
+  .dl-item { background: white; border-radius: 10px; padding: 12px 16px; cursor: pointer; border: 1.5px solid #ddd; text-align: left; transition: border .2s; }
+  .dl-item:hover { border-color: var(--verde); }
+  .dl-item .dl-q { font-size: 13px; color: var(--cinza); font-weight: 600; }
+  .dl-item .dl-q span { color: var(--dourado); font-style: italic; }
+  .dl-item .dl-a { display: none; font-size: 13px; background: #e8f5ee; border-left: 3px solid var(--verde); border-radius: 6px; padding: 7px 10px; color: var(--verde); font-weight: 700; margin-top: 6px; line-height: 1.6; }
+  .dl-item.revealed .dl-a { display: block; }
+  .dl-item .dl-hint { font-size: 10px; color: #ccc; }
+
+  /* REORDER GAME */
+  .reorder-wrap { width: 100%; max-width: 660px; }
+  .reorder-title { font-size: 12px; color: #777; margin-bottom: 10px; text-align: left; }
+  .ro-items { display: flex; flex-direction: column; gap: 7px; }
+  .ro-item { background: #ffffff; border: 2px solid #c8bfa8; border-radius: 10px; padding: 11px 15px; font-size: 13px; color: var(--cinza); cursor: pointer; display: flex; gap: 10px; align-items: center; transition: all .2s; text-align: left; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .ro-item:hover { background: var(--bege2); border-color: var(--verde); }
+  .ro-item .ro-num { font-size: 11px; font-weight: 800; color: var(--verde); min-width: 20px; opacity: .7; }
+  .ro-item.selected { background: rgba(31,77,58,.1); border-color: var(--verde); color: var(--verde); font-weight: 600; }
+  .ro-item.selected .ro-num { opacity: 1; }
+  .ro-item .ro-seq { font-weight: 700; color: var(--dourado); }
+  .ro-answer { display: none; margin-top: 12px; background: #edf5f0; border-radius: 10px; padding: 14px 18px; font-size: 13px; color: var(--cinza); line-height: 1.9; border-left: 4px solid var(--verde); text-align: left; }
+  .ro-answer strong { color: var(--verde); }
+  .ro-answer.visible { display: block; }
+  .ro-btn { margin-top: 10px; background: var(--verde); color: #fff; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; letter-spacing: .3px; }
+
+  /* DYNAMIC */
+  .dyn-box { background: rgba(255,255,255,.06); border-radius: 16px; padding: 18px 22px; width: 100%; max-width: 660px; text-align: left; }
+  .dyn-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+  .dyn-step:last-child { margin-bottom: 0; }
+  .dyn-num { width: 26px; height: 26px; border-radius: 50%; background: var(--dourado); color: var(--verde); font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .dyn-txt { flex: 1; }
+  .dyn-txt .dt { font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 2px; }
+  .dyn-txt .dd { font-size: 12px; color: rgba(253,239,219,.6); line-height: 1.5; }
+  .dyn-txt .de { font-size: 12px; color: var(--dourado); font-style: italic; margin-top: 3px; }
+
+  /* TASK */
+  .task-box { background: rgba(255,255,255,.06); border: 2px solid var(--dourado); border-radius: 16px; padding: 20px 24px; width: 100%; max-width: 580px; text-align: left; margin-bottom: 16px; }
+  .task-box .ti { display: flex; gap: 10px; margin-bottom: 10px; font-size: 14px; color: var(--bege); line-height: 1.5; }
+  .task-box .ti:last-child { margin-bottom: 0; }
+  .wa-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 14px; transition: opacity .2s; width: 100%; max-width: 320px; }
+  .wa-btn:hover { opacity: .85; }
+
+  /* REVIEW GRID */
+  .rev-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 640px; }
+  .rev-card { background: white; border-radius: 12px; padding: 12px 16px; text-align: left; border-top: 3px solid var(--verde); }
+  .rev-card .rc-label { font-size: 10px; color: #999; margin-bottom: 4px; }
+  .rev-card .rc-words { display: flex; flex-direction: column; gap: 3px; }
+  .rev-card .rc-w { font-weight: 700; font-size: 13px; color: var(--verde); }
+  .rev-card .rc-w span { font-weight: 400; font-size: 11px; color: var(--dourado); font-style: italic; }
+
+  /* NAV */
+  .nav { display: flex; align-items: center; justify-content: space-between; background: #1a1a1a; padding: 10px 20px; gap: 12px; border-top: 1px solid #333; }
+  .nav-btn { background: var(--verde); color: var(--bege); border: none; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .2s; font-family: inherit; }
+  .nav-btn:hover { opacity: .8; }
+  .nav-btn:disabled { opacity: .25; cursor: default; }
+  .nav-dots { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; flex: 1; }
+  .nav-dot { width: 7px; height: 7px; border-radius: 50%; background: #555; cursor: pointer; transition: background .2s; border: none; }
+  .nav-dot.active { background: var(--dourado); }
+  .slide-counter { font-size: 12px; color: #666; min-width: 50px; text-align: right; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1: CAPA -->
+  <div class="slide slide-gold active">
+    <div class="slide-number">1 / 14</div>
+    <div class="brand-tag">Teacher Karoline Oliveira · Método BERC</div>
+    <div style="font-size:13px; color:var(--dourado); margin-bottom:6px;">NETO · Aula 5 · A2+</div>
+    <div class="gold-line"></div>
+    <h1>Descrevendo<br>Processos</h1>
+    <div class="gold-line"></div>
+    <p class="subtitle">Como explicar o que você faz<br>passo a passo em inglês</p>
+    <div style="margin-top:20px; font-size:12px; opacity:.45;">← → para navegar · clique para revelar drills</div>
+  </div>
+
+  <!-- 2: OBJETIVOS -->
+  <div class="slide slide-dark">
+    <div class="slide-number">2 / 14</div>
+    <div class="ctag">Sequência da Aula 4</div>
+    <h2>O que você vai aprender hoje</h2>
+    <div class="gold-line"></div>
+    <div class="obj-list">
+      <div class="obj-item"><span class="obj-text">🔢 Usar <strong>4 sequenciadores</strong> para organizar qualquer explicação: first, then, after that, finally</span></div>
+      <div class="obj-item"><span class="obj-text">🔧 Descrever <strong>processos reais</strong> do trabalho com turbinas — manutenção, inspeção, subida na torre</span></div>
+      <div class="obj-item"><span class="obj-text">🔗 Combinar sequenciadores + <strong>conectores da Aula 4</strong> (and, but, so, because)</span></div>
+      <div class="obj-item"><span class="obj-text">🎤 Explicar um processo inteiro de <strong>5 passos em inglês</strong> sem parar</span></div>
+    </div>
+  </div>
+
+  <!-- 3: WARM-UP -->
+  <div class="slide slide-light">
+    <div class="slide-number">3 / 14</div>
+    <div class="ctag" style="color:var(--verde); border-color:var(--verde); background:rgba(31,77,58,.08);">Warm-up</div>
+    <h2 style="color:var(--verde);">Recap rápido — Aulas 2, 3 e 4</h2>
+    <div class="gold-line"></div>
+    <p style="font-size:14px; color:#555; max-width:500px; margin-bottom:16px;">Antes de aprender a descrever processos, vamos ativar o que você já sabe. Responda em voz alta — com frase completa e pelo menos um conector.</p>
+    <div class="drill-light">
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">Can you explain your job in one sentence? <span>(Use: because ou and)</span></div>
+        <div class="dl-a">I'm a wind turbine technician and I do maintenance and inspections because it's essential for energy production.</div>
+        <div class="dl-hint">clique para ver modelo</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">How was your last inspection? <span>(Use: but ou so)</span></div>
+        <div class="dl-a">It was long but we finished everything on time, so the turbine is working again.</div>
+        <div class="dl-hint">clique para ver modelo</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">Did you do anything challenging at work recently?</div>
+        <div class="dl-a">Yes, I did. I climbed a 90-meter tower because the blade had a problem. It was scary but I did it.</div>
+        <div class="dl-hint">clique para ver modelo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4: OS 4 SEQUENCIADORES -->
+  <div class="slide slide-dark">
+    <div class="slide-number">4 / 14</div>
+    <div class="ctag">Novo Conteúdo</div>
+    <h2>Os 4 Sequenciadores</h2>
+    <div class="gold-line"></div>
+    <div class="seq-chain">
+      <div class="seq-item">
+        <div class="seq-left"><div class="seq-dot">1</div><div class="seq-line"></div></div>
+        <div class="seq-content">
+          <div class="seq-word">First</div>
+          <div class="seq-pron">/féerst/ — "fêrst"</div>
+          <div class="seq-meaning">Primeiro — começa o processo</div>
+          <div class="seq-ex"><strong>First,</strong> I check the safety equipment.</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-left"><div class="seq-dot">2</div><div class="seq-line"></div></div>
+        <div class="seq-content">
+          <div class="seq-word">Then</div>
+          <div class="seq-pron">/dhén/ — "den"</div>
+          <div class="seq-meaning">Depois — segundo passo</div>
+          <div class="seq-ex"><strong>Then,</strong> I climb the tower with my team.</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-left"><div class="seq-dot">3</div><div class="seq-line"></div></div>
+        <div class="seq-content">
+          <div class="seq-word">After that</div>
+          <div class="seq-pron">/áfter dhæt/ — "áfter dat"</div>
+          <div class="seq-meaning">Depois disso — continua</div>
+          <div class="seq-ex"><strong>After that,</strong> I inspect the gearbox and the blade.</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-left"><div class="seq-dot">4</div></div>
+        <div class="seq-content">
+          <div class="seq-word">Finally</div>
+          <div class="seq-pron">/fáïneli/ — "fáï-ne-li"</div>
+          <div class="seq-meaning">Por fim — encerra o processo</div>
+          <div class="seq-ex"><strong>Finally,</strong> I write the inspection report.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5: PROCESSO COMPLETO — MANUTENÇÃO -->
+  <div class="slide slide-dark">
+    <div class="slide-number">5 / 14</div>
+    <div class="ctag">Processo Real</div>
+    <h2>Manutenção de uma turbina</h2>
+    <div class="gold-line"></div>
+    <div class="process-card">
+      <div class="pc-tag">Como Neto descreve seu trabalho em inglês</div>
+      <div class="pc-title">🔧 "How do you do a turbine inspection?"</div>
+      <div class="pc-steps">
+        <div class="pc-step">
+          <div class="pc-num">1</div>
+          <div class="pc-text"><span class="seq">First,</span> I put on my safety gear — helmet, harness and gloves.<span class="pron">/féerst ai pút on maï séïfti guíer/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">2</div>
+          <div class="pc-text"><span class="seq">Then,</span> I climb the tower. It's usually 60 to 90 meters high.<span class="pron">/dhén ai kláïm dhê táuer/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">3</div>
+          <div class="pc-text"><span class="seq">After that,</span> I check the gearbox, the blade and the generator.<span class="pron">/áfter dhæt ai tchék dhê guírbaks/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">4</div>
+          <div class="pc-text">If there's a problem, I fix it <span class="seq">or</span> I call my supervisor.<span class="pron">/if dhérs e próblem ai fíks it/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">5</div>
+          <div class="pc-text"><span class="seq">Finally,</span> I write the inspection report and come down.<span class="pron">/fáïneli ai ráït dhê inspékshen ripórt/</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6: PROCESSO COMPLETO — ROTINA -->
+  <div class="slide slide-dark">
+    <div class="slide-number">6 / 14</div>
+    <div class="ctag">Outro Contexto</div>
+    <h2>Descrevendo a rotina de trabalho</h2>
+    <div class="gold-line"></div>
+    <div class="process-card">
+      <div class="pc-tag">Rotina diária no parque eólico</div>
+      <div class="pc-title">📅 "What does your typical workday look like?"</div>
+      <div class="pc-steps">
+        <div class="pc-step">
+          <div class="pc-num">1</div>
+          <div class="pc-text"><span class="seq">First,</span> I arrive at the wind farm and check the schedule for the day.<span class="pron">/féerst ai eráïv æt dhê uínd fárm/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">2</div>
+          <div class="pc-text"><span class="seq">Then,</span> I meet with my team and we discuss the work plan.<span class="pron">/dhén ai mít uith maï tím/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">3</div>
+          <div class="pc-text"><span class="seq">After that,</span> we go to the turbines and start the maintenance.<span class="pron">/áfter dhæt uí goú tu dhê tôrbaïnz/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">4</div>
+          <div class="pc-text">We work for about 6 to 8 hours, <span class="seq">so</span> it's a long day but I enjoy it.<span class="pron">/uí uérk for ebáut síks tu éït áuers/</span></div>
+        </div>
+        <div class="pc-step">
+          <div class="pc-num">5</div>
+          <div class="pc-text"><span class="seq">Finally,</span> I write the daily report and go home.<span class="pron">/fáïneli ai ráït dhê déili ripórt/</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7: DRILL SEQUENCIADORES -->
+  <div class="slide slide-dark">
+    <div class="slide-number">7 / 14</div>
+    <h3 style="margin-bottom:10px;">Drill: qual sequenciador completa a frase? 👆 clique</h3>
+    <div class="drill-dark">
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">___, I check the turbine report. <span>(começo do processo)</span></div>
+        <div class="dd-a">✅ <strong>First,</strong> I check the turbine report. /féerst/</div>
+        <div class="dd-hint">clique para ver</div>
+      </div>
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">___, I climb the tower to inspect the blade. <span>(2º passo)</span></div>
+        <div class="dd-a">✅ <strong>Then,</strong> I climb the tower to inspect the blade. /dhén/</div>
+        <div class="dd-hint">clique para ver</div>
+      </div>
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">___, I clean the generator and check the cables. <span>(continua)</span></div>
+        <div class="dd-a">✅ <strong>After that,</strong> I clean the generator and check the cables. /áfter dhæt/</div>
+        <div class="dd-hint">clique para ver</div>
+      </div>
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">___, I sign the maintenance sheet and go back to base. <span>(fim)</span></div>
+        <div class="dd-a">✅ <strong>Finally,</strong> I sign the maintenance sheet and go back to base. /fáïneli/</div>
+        <div class="dd-hint">clique para ver</div>
+      </div>
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">___, the blade was damaged, ___ we had to stop the turbine. <span>(conectores)</span></div>
+        <div class="dd-a">✅ The blade was damaged, <strong>so</strong> we had to stop the turbine. <strong>Then</strong> we called the engineer.</div>
+        <div class="dd-hint">clique para ver</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8: REORDER GAME -->
+  <div class="slide slide-light">
+    <div class="slide-number">8 / 14</div>
+    <div class="ctag" style="color:var(--verde); border-color:var(--verde); background:rgba(31,77,58,.08);">Atividade</div>
+    <h2 style="color:var(--verde);">Reordene os passos</h2>
+    <div class="gold-line"></div>
+    <p style="font-size:13px; color:#555; margin-bottom:14px;">Clique nos passos na ordem correta para descrever uma inspeção. Depois clique em <strong>Ver resposta</strong>.</p>
+    <div class="reorder-wrap">
+      <div class="ro-items">
+        <div class="ro-item" onclick="this.classList.toggle('selected')"><span class="ro-num">?</span><span>I write the inspection report and go home.</span></div>
+        <div class="ro-item" onclick="this.classList.toggle('selected')"><span class="ro-num">?</span><span>I put on my safety equipment.</span></div>
+        <div class="ro-item" onclick="this.classList.toggle('selected')"><span class="ro-num">?</span><span>I check the gearbox and the blade.</span></div>
+        <div class="ro-item" onclick="this.classList.toggle('selected')"><span class="ro-num">?</span><span>I climb the tower with my harness.</span></div>
+        <div class="ro-item" onclick="this.classList.toggle('selected')"><span class="ro-num">?</span><span>I fix any problems I find.</span></div>
+      </div>
+      <button class="ro-btn" onclick="document.getElementById('ro-ans').classList.add('visible')">Ver resposta correta</button>
+      <div class="ro-answer" id="ro-ans">
+        <strong style="color:var(--dourado);">Ordem correta:</strong><br>
+        <strong>First,</strong> I put on my safety equipment.<br>
+        <strong>Then,</strong> I climb the tower with my harness.<br>
+        <strong>After that,</strong> I check the gearbox and the blade.<br>
+        I fix any problems I find.<br>
+        <strong>Finally,</strong> I write the inspection report and go home.
+      </div>
+    </div>
+  </div>
+
+  <!-- 9: INSTRUÇÃO DA DINÂMICA -->
+  <div class="slide slide-mid">
+    <div class="slide-number">9 / 14</div>
+    <div class="ctag">Dinâmica Principal</div>
+    <h2>Neto explica o trabalho para David</h2>
+    <div class="gold-line"></div>
+    <p style="font-size:14px; color:rgba(253,239,219,.75); max-width:520px; margin-bottom:18px; line-height:1.6;">Lembra do David — o técnico estrangeiro da Aula 4? Ele voltou e quer entender como funciona uma manutenção de turbina. Você vai explicar pra ele.</p>
+    <div class="dyn-box">
+      <div class="dyn-step">
+        <div class="dyn-num">1</div>
+        <div class="dyn-txt">
+          <div class="dt">David pergunta</div>
+          <div class="dd">Teacher faz a pergunta no papel de David.</div>
+          <div class="de">"Neto, how do you do a turbine inspection? Can you explain?"</div>
+        </div>
+      </div>
+      <div class="dyn-step">
+        <div class="dyn-num">2</div>
+        <div class="dyn-txt">
+          <div class="dt">Neto explica — 5 passos sem parar</div>
+          <div class="dd">Usar: First → Then → After that → [passo livre] → Finally.</div>
+          <div class="de">Pode olhar os slides 5 e 6 na primeira vez. Na segunda, de memória.</div>
+        </div>
+      </div>
+      <div class="dyn-step">
+        <div class="dyn-num">3</div>
+        <div class="dyn-txt">
+          <div class="dt">David faz perguntas de acompanhamento</div>
+          <div class="dd">Teacher interrompe com perguntas simples. Neto responde com os padrões da Aula 3.</div>
+          <div class="de">"How long does it take?" / "Did you ever fall?" / "Can you do it alone?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10: PERGUNTAS DO DAVID -->
+  <div class="slide slide-light">
+    <div class="slide-number">10 / 14</div>
+    <h2 style="color:var(--verde);">Perguntas do David — responda!</h2>
+    <div class="gold-line"></div>
+    <p style="font-size:13px; color:#666; margin-bottom:12px;">David interrompe a explicação com essas perguntas. Use os padrões da Aula 3 + conectores da Aula 4. Clique para ver modelo.</p>
+    <div class="drill-light">
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">"How long does the whole inspection take?" <span>(How was / It takes...)</span></div>
+        <div class="dl-a">It usually takes about 4 to 6 hours, because we have to check everything carefully.</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">"Did you ever have an accident up there?" <span>(Did you / Yes or No + detail)</span></div>
+        <div class="dl-a">No, I didn't, but I had a few scary moments. The safety gear is really important, so I always check it first.</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">"Can you do the inspection alone or do you need a team?" <span>(Can you / Yes + expand)</span></div>
+        <div class="dl-a">I can do some parts alone, but the main inspection needs a team because it's safer and faster.</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">"What do you do if the turbine has a serious problem?" <span>(What do you / I + sequence)</span></div>
+        <div class="dl-a">First, I stop the turbine. Then, I call my supervisor. After that, we decide together how to fix it.</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11: DESAFIO — ROTINA -->
+  <div class="slide slide-dark">
+    <div class="slide-number">11 / 14</div>
+    <div class="ctag">Desafio</div>
+    <h2>Descreva outro processo</h2>
+    <div class="gold-line"></div>
+    <p class="subtitle" style="margin-bottom:18px;">Agora sem o modelo. Escolha um processo e descreva em 5 passos. Use: First → Then → After that → [livre] → Finally.</p>
+    <div class="drill-dark">
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">🌅 <strong>Opção A:</strong> Sua rotina da manhã antes de ir trabalhar</div>
+        <div class="dd-a">Ex: First, I wake up at 5am. Then, I have breakfast. After that, I check my work schedule. I put on my work clothes. Finally, I drive to the wind farm.</div>
+        <div class="dd-hint">clique para ver um modelo</div>
+      </div>
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">⚡ <strong>Opção B:</strong> O que acontece quando uma turbina para de funcionar</div>
+        <div class="dd-a">Ex: First, we get an alarm on the system. Then, I go to check the turbine. After that, I identify the problem. I fix it or call an engineer. Finally, I restart the turbine and write a report.</div>
+        <div class="dd-hint">clique para ver um modelo</div>
+      </div>
+      <div class="dd-item" onclick="this.classList.toggle('revealed')">
+        <div class="dd-q">🎣 <strong>Opção C:</strong> Como você prepara uma ida à pesca</div>
+        <div class="dd-a">Ex: First, I choose the right spot. Then, I prepare my equipment. After that, I drive to the lake. I fish for a few hours. Finally, I go home and clean the fish.</div>
+        <div class="dd-hint">clique para ver um modelo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12: CONSOLIDAÇÃO — DRILL COMBINADO -->
+  <div class="slide slide-light">
+    <div class="slide-number">12 / 14</div>
+    <h2 style="color:var(--verde);">Drill Final — Tudo junto</h2>
+    <div class="gold-line"></div>
+    <p style="font-size:13px; color:#666; margin-bottom:12px;">Sequenciadores + conectores + padrões de resposta. Uma frase de cada vez. Clique para ver.</p>
+    <div class="drill-light">
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">Como você começa a explicar a inspeção? <span>(First + and)</span></div>
+        <div class="dl-a">First, I check my safety equipment and I talk to my team about the plan.</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">O que vem depois? <span>(Then + but)</span></div>
+        <div class="dl-a">Then, I climb the tower. It's tiring but it's part of the job.</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">Como você termina? <span>(Finally + so ou because)</span></div>
+        <div class="dl-a">Finally, I write the report because the company needs all the data, so I take my time to do it right.</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+      <div class="dl-item" onclick="this.classList.toggle('revealed')">
+        <div class="dl-q">Did you like working with the foreign team? <span>(Yes + sequenciador na resposta)</span></div>
+        <div class="dl-a">Yes, I did. First, it was difficult because of the language. But then, I used what I learned and I communicated!</div>
+        <div class="dl-hint">clique para ver</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13: REVISÃO -->
+  <div class="slide slide-light">
+    <div class="slide-number">13 / 14</div>
+    <h2 style="color:var(--verde);">O que você aprendeu hoje</h2>
+    <div class="gold-line"></div>
+    <div class="rev-grid">
+      <div class="rev-card">
+        <div class="rc-label">Sequenciadores</div>
+        <div class="rc-words">
+          <div class="rc-w">First <span>/féerst/</span></div>
+          <div class="rc-w">Then <span>/dhén/</span></div>
+          <div class="rc-w">After that <span>/áfter dhæt/</span></div>
+          <div class="rc-w">Finally <span>/fáïneli/</span></div>
+        </div>
+      </div>
+      <div class="rev-card">
+        <div class="rc-label">Conectores (Aula 4)</div>
+        <div class="rc-words">
+          <div class="rc-w">and · but</div>
+          <div class="rc-w">so · because</div>
+        </div>
+        <div style="font-size:11px; color:#aaa; margin-top:8px;">Combine com os sequenciadores para respostas mais ricas.</div>
+      </div>
+      <div class="rev-card" style="grid-column:1/-1;">
+        <div class="rc-label">Estrutura de um processo completo</div>
+        <div style="font-size:13px; color:var(--verde); font-weight:700; line-height:1.8;">
+          <span style="color:var(--dourado);">First</span> → ação 1&nbsp;&nbsp;·&nbsp;&nbsp;
+          <span style="color:var(--dourado);">Then</span> → ação 2&nbsp;&nbsp;·&nbsp;&nbsp;
+          <span style="color:var(--dourado);">After that</span> → ação 3&nbsp;&nbsp;·&nbsp;&nbsp;
+          [livre]&nbsp;&nbsp;·&nbsp;&nbsp;
+          <span style="color:var(--dourado);">Finally</span> → conclusão
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12px; color:#aaa; margin-top:14px;">Próxima aula: expressões de tempo — "I've been working here for 3 years. Last week I..."</p>
+  </div>
+
+  <!-- 14: TAREFA -->
+  <div class="slide slide-gold">
+    <div class="slide-number">14 / 14</div>
+    <div class="brand-tag">Tarefa da Semana</div>
+    <h2>Grave um processo<br><span style="color:var(--dourado);">inteiro em inglês.</span></h2>
+    <div class="gold-line"></div>
+    <div class="task-box">
+      <div class="ti"><span>🎤</span><span>Grave um <strong>áudio de 1 a 2 minutos</strong> descrevendo um processo do seu trabalho em 5 passos — usando First, Then, After that e Finally.</span></div>
+      <div class="ti"><span>🔗</span><span>Use pelo menos <strong>2 conectores</strong> (and, but, so, because) dentro dos passos.</span></div>
+      <div class="ti"><span>💡</span><span>Sugestão: descreva como você sobe a torre, como faz uma manutenção, ou sua rotina de manhã no parque eólico.</span></div>
+    </div>
+    <a class="wa-btn" href="https://wa.me/5577999155856?text=Hello%20teacher!%20Estou%20enviando%20o%20audio%20do%20processo%20em%20ingl%C3%AAs%20da%20Aula%205%20do%20Dia%201" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar áudio para a Teacher
+    </a>
+    <p style="font-size:11px; opacity:.4; margin-top:10px;">Teacher Karoline Oliveira · @teacherkarolineoliveira</p>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled>← Anterior</button>
+  <div class="nav-dots" id="dots"></div>
+  <span class="slide-counter" id="counter">1 / 14</span>
+  <button class="nav-btn" id="next-btn" onclick="nextSlide()">Próximo →</button>
+</div>
+
+<script>
+  const total = 14, slides = document.querySelectorAll('.slide'), dotsWrap = document.getElementById('dots');
+  let cur = 0;
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('button');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsWrap.appendChild(d);
+  }
+  function goTo(n) {
+    slides[cur].classList.remove('active'); dotsWrap.children[cur].classList.remove('active');
+    cur = n;
+    slides[cur].classList.add('active'); dotsWrap.children[cur].classList.add('active');
+    document.getElementById('counter').textContent = (cur+1)+' / '+total;
+    document.getElementById('prev-btn').disabled = cur === 0;
+    document.getElementById('next-btn').disabled = cur === total-1;
+  }
+  function nextSlide() { if (cur < total-1) goTo(cur+1); }
+  function prevSlide() { if (cur > 0) goTo(cur-1); }
+  document.addEventListener('keydown', e => {
+    if (e.key==='ArrowRight'||e.key==='ArrowDown') nextSlide();
+    if (e.key==='ArrowLeft'||e.key==='ArrowUp') prevSlide();
+  });
+</script>
+</body>
+</html>
