@@ -365,6 +365,10 @@
   .btn-cancel-edit { flex: 1; padding: 11px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 0.88rem; cursor: pointer; color: var(--muted); }
   .btn-download { flex: 2; padding: 11px; border-radius: 10px; border: none; background: #1A6B4A; color: #fff; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
   .btn-download:hover { opacity: 0.88; }
+  .link-row { display: flex; gap: 6px; }
+  .link-row input { flex: 1; }
+  .btn-file { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: var(--primary-light); color: var(--primary); border-radius: 9px; cursor: pointer; font-size: 1rem; flex-shrink: 0; border: 1.5px solid var(--border); }
+  .btn-file:hover { background: var(--primary); color: #fff; }
 </style>
 </head>
 <body>
@@ -434,7 +438,9 @@
         <div class="field"><label>Status</label>
           <select id="p-status"><option value="novo">Novo</option><option value="andamento">Em andamento</option><option value="concluido">Concluído</option></select>
         </div>
-        <div class="field"><label>Link do arquivo</label><input id="p-link" placeholder="planos/julho-2025.html"></div>
+        <div class="field"><label>Link do arquivo</label>
+          <div class="link-row"><input id="p-link" placeholder="planos/julho-2025.html"><label class="btn-file" for="p-file" title="Selecionar arquivo">📁</label><input type="file" id="p-file" style="display:none" onchange="selecionarArquivo('p-link','planos/',this)"></div>
+        </div>
       </div>
       <button class="btn-add" onclick="adicionarPlano()">+ Adicionar plano</button>
     </div>
@@ -448,7 +454,9 @@
           <select id="a-tipo"><option value="pdf">PDF</option><option value="slides">Slides</option><option value="exercicio">Exercício</option><option value="link">Link</option></select>
         </div>
       </div>
-      <div class="field"><label>Link do arquivo</label><input id="a-link" placeholder="aulas/aula-10jul2025.pdf"></div>
+      <div class="field"><label>Link do arquivo</label>
+        <div class="link-row"><input id="a-link" placeholder="aulas/aula-10jul2025.pdf"><label class="btn-file" for="a-file" title="Selecionar arquivo">📁</label><input type="file" id="a-file" style="display:none" onchange="selecionarArquivo('a-link','aulas/',this)"></div>
+      </div>
       <button class="btn-add" onclick="adicionarAula()">+ Adicionar aula</button>
     </div>
     <div class="tab-content" id="tab-materiais">
@@ -461,7 +469,9 @@
         </div>
         <div class="field"><label>Data de envio</label><input id="m-data" placeholder="10/07/2025"></div>
       </div>
-      <div class="field"><label>Link do arquivo</label><input id="m-link" placeholder="materiais/vocab.pdf"></div>
+      <div class="field"><label>Link do arquivo</label>
+        <div class="link-row"><input id="m-link" placeholder="materiais/vocab.pdf"><label class="btn-file" for="m-file" title="Selecionar arquivo">📁</label><input type="file" id="m-file" style="display:none" onchange="selecionarArquivo('m-link','materiais/',this)"></div>
+      </div>
       <button class="btn-add" onclick="adicionarMaterial()">+ Adicionar material</button>
     </div>
     <div class="panel-footer">
@@ -551,6 +561,12 @@
     document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("tab-"+id).classList.add("active");
+  }
+
+  function selecionarArquivo(inputId, pasta, fileInput) {
+    if (fileInput.files[0]) {
+      document.getElementById(inputId).value = pasta + fileInput.files[0].name;
+    }
   }
 
   function abrirEditor() {
