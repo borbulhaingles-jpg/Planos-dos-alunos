@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Plano de Estudos</title>
+<style>
+  :root {
+    --primary: #6C63FF;
+    --primary-light: #EEF0FF;
+    --green: #43C59E;
+    --yellow: #FFB830;
+    --accent: #FF6584;
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --text: #1E1E2D;
+    --muted: #8F90A6;
+    --border: #E8E9F0;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(108,99,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  .top-bar {
+    background: var(--primary);
+    padding: 20px 24px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .top-bar .avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: 700; flex-shrink: 0;
+  }
+  .top-bar h1 { font-size: 1.2rem; font-weight: 700; }
+  .top-bar p { font-size: 0.83rem; opacity: 0.85; margin-top: 2px; }
+  .top-bar .logo { margin-left: auto; font-size: 1.5rem; }
+
+  /* CONTENT */
+  .content { max-width: 700px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* TAGS */
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .tag { padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+  .tag.purple { background: var(--primary-light); color: var(--primary); }
+  .tag.green { background: #E6FAF4; color: var(--green); }
+  .tag.yellow { background: #FFF6E5; color: #c98a00; }
+
+  /* STAT ROW */
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 24px 0; }
+  .stat-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
+  .stat-val { font-size: 1.8rem; font-weight: 800; }
+  .stat-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  /* SECTION */
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 0.82rem; font-weight: 700; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.07em; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* CARD */
+  .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+
+  /* ACTIVITIES */
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 14px;
+    border-radius: 12px; border: 1.5px solid var(--border); margin-bottom: 10px;
+    transition: all 0.2s; background: #fff;
+  }
+  .activity-item.done { background: #F9FAF9; border-color: #d4f0e8; }
+
+  .check-btn {
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border);
+    background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 0.8rem; transition: all 0.2s; margin-top: 1px;
+  }
+  .check-btn.checked { background: var(--green); border-color: var(--green); color: #fff; }
+  .check-btn:hover:not(.checked) { border-color: var(--green); background: #f0fdf8; }
+
+  .activity-body { flex: 1; }
+  .activity-title { font-size: 0.95rem; font-weight: 600; transition: all 0.2s; }
+  .activity-title.done { text-decoration: line-through; color: var(--muted); font-weight: 400; }
+  .activity-meta { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
+  .activity-meta span { font-size: 0.77rem; color: var(--muted); }
+  .activity-notes { font-size: 0.83rem; color: var(--muted); margin-top: 6px; background: var(--bg); border-radius: 8px; padding: 8px 10px; line-height: 1.5; }
+
+  .done-badge { background: #E6FAF4; color: var(--green); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+  .pending-badge { background: #FFF6E5; color: #c98a00; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+
+  /* PROGRESS BARS */
+  .comp-list { display: flex; flex-direction: column; gap: 14px; }
+  .comp-row { display: flex; flex-direction: column; gap: 4px; }
+  .comp-header { display: flex; justify-content: space-between; font-size: 0.88rem; }
+  .comp-name { font-weight: 600; }
+  .comp-score { color: var(--muted); font-size: 0.8rem; }
+  .bar-track { height: 10px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+  .bar-fill.speaking { background: #6C63FF; }
+  .bar-fill.listening { background: #43C59E; }
+  .bar-fill.grammar { background: #FFB830; }
+  .bar-fill.reading { background: #FF6584; }
+  .bar-fill.writing { background: #4EAFF0; }
+
+  /* EMPTY / LOADING */
+  .empty { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 0.9rem; }
+  .empty .icon { font-size: 2.5rem; margin-bottom: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 60px auto; }
+
+  /* ERROR */
+  .error-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; gap: 12px; color: var(--muted); padding: 20px; }
+  .error-screen h2 { color: var(--text); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1E1E2D; color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; z-index: 999; opacity: 0; transition: all 0.3s; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* FILTER TABS */
+  .filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-tab { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+  .filter-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+</style>
+</head>
+<body>
+<div id="loading-screen"><div class="spinner"></div></div>
+<div id="error-screen" style="display:none">
+  <div class="error-screen">
+    <div style="font-size:3rem">😕</div>
+    <h2>Link inválido</h2>
+    <p>Peça à sua professora o link correto do seu plano de estudos.</p>
+  </div>
+</div>
+<div id="main" style="display:none">
+  <div class="top-bar">
+    <div class="avatar" id="hdr-avatar"></div>
+    <div>
+      <h1 id="hdr-name"></h1>
+      <p id="hdr-sub"></p>
+    </div>
+    <div class="logo">📚</div>
+  </div>
+  <div class="content">
+    <div class="tags" id="hdr-tags"></div>
+    <div class="stat-row" id="stat-row"></div>
+
+    <!-- PLANO DE ESTUDOS -->
+    <div class="section">
+      <div class="section-title">Plano de estudos</div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all',this)">Todas</button>
+        <button class="filter-tab" onclick="setFilter('pending',this)">Pendentes</button>
+        <button class="filter-tab" onclick="setFilter('done',this)">Concluídas</button>
+      </div>
+      <div id="activities-list"></div>
+    </div>
+
+    <!-- PROGRESSO -->
+    <div class="section">
+      <div class="section-title">Meu progresso</div>
+      <div class="card">
+        <div class="comp-list" id="comp-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://qtxbkmfuqhtbrqzzrdtd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_31GiSWapiT_SRxZZ3fDQEg_W8n0NPoa';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const COMPETENCIES = ['Speaking','Listening','Grammar','Reading','Writing'];
+const COMP_COLS = ['comp_speaking','comp_listening','comp_grammar','comp_reading','comp_writing'];
+const COMP_CLASS = ['speaking','listening','grammar','reading','writing'];
+
+let studentData = null;
+let activities = [];
+let lessons = [];
+let currentFilter = 'all';
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function initials(name) { return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function formatDate(iso) { if (!iso) return ''; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const studentId = params.get('id');
+  if (!studentId) { showError(); return; }
+
+  const [sRes, aRes, lRes] = await Promise.all([
+    db.from('students').select('*').eq('id', studentId).single(),
+    db.from('activities').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),
+    db.from('lessons').select('*').eq('student_id', studentId).order('date', { ascending: false })
+  ]);
+
+  if (sRes.error || !sRes.data) { showError(); return; }
+
+  studentData = sRes.data;
+  activities = aRes.data || [];
+  lessons = lRes.data || [];
+
+  renderPage();
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+}
+
+function showError() {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('error-screen').style.display = 'flex';
+}
+
+function renderPage() {
+  const s = studentData;
+  document.title = `Plano — ${s.name}`;
+  document.getElementById('hdr-avatar').textContent = initials(s.name);
+  document.getElementById('hdr-name').textContent = s.name;
+  document.getElementById('hdr-sub').textContent = s.objective || 'Plano de estudos de inglês';
+
+  const tags = document.getElementById('hdr-tags');
+  tags.innerHTML = [
+    s.level ? `<span class="tag purple">${s.level}</span>` : '',
+    s.goal_level ? `<span class="tag yellow">Meta: ${s.goal_level}</span>` : '',
+    s.frequency ? `<span class="tag green">${s.frequency}</span>` : ''
+  ].join('');
+
+  const done = activities.filter(a => a.done).length;
+  const pending = activities.length - done;
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${lessons.length}</div><div class="stat-lbl">Aulas</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${done}</div><div class="stat-lbl">Feitas</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:${pending>0?'var(--accent)':'var(--green)'}">${pending}</div><div class="stat-lbl">Pendentes</div></div>
+  `;
+
+  renderActivities();
+  renderProgress();
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderActivities();
+}
+
+function renderActivities() {
+  const list = document.getElementById('activities-list');
+  let filtered = activities;
+  if (currentFilter === 'pending') filtered = activities.filter(a => !a.done);
+  if (currentFilter === 'done') filtered = activities.filter(a => a.done);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="icon">${currentFilter==='done'?'🎉':'📋'}</div>${
+      currentFilter==='done' ? 'Nenhuma atividade concluída ainda.' :
+      currentFilter==='pending' ? 'Nenhuma atividade pendente. Tudo em dia! 🎉' :
+      'Nenhuma atividade no plano ainda.'
+    }</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(a => `
+    <div class="activity-item ${a.done ? 'done' : ''}" id="item-${a.id}">
+      <button class="check-btn ${a.done ? 'checked' : ''}" onclick="toggleDone('${a.id}', ${a.done})">${a.done ? '✓' : ''}</button>
+      <div class="activity-body">
+        <div class="activity-title ${a.done ? 'done' : ''}">${a.type || ''} ${a.title}</div>
+        <div class="activity-meta">
+          ${a.deadline ? `<span>⏰ Até ${formatDate(a.deadline)}</span>` : ''}
+          ${a.done && a.done_at ? `<span>✅ Concluída em ${formatDate(a.done_at.split('T')[0])}</span>` : ''}
+          ${a.done ? `<span class="done-badge">Feita</span>` : `<span class="pending-badge">Pendente</span>`}
+        </div>
+        ${a.notes ? `<div class="activity-notes">${a.notes}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function toggleDone(id, currentDone) {
+  const newDone = !currentDone;
+  const update = { done: newDone, done_at: newDone ? new Date().toISOString() : null };
+  const { error } = await db.from('activities').update(update).eq('id', id);
+  if (error) { toast('Erro ao atualizar'); return; }
+  const idx = activities.findIndex(a => a.id === id);
+  if (idx !== -1) { activities[idx].done = newDone; activities[idx].done_at = update.done_at; }
+  renderActivities();
+  renderPage();
+  toast(newDone ? '✅ Atividade concluída!' : 'Marcada como pendente');
+}
+
+function renderProgress() {
+  const list = document.getElementById('comp-list');
+  if (lessons.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="icon">📈</div>Seu progresso aparece aqui conforme as aulas são registradas.</div>';
+    return;
+  }
+  const avg = {};
+  COMPETENCIES.forEach((c,i) => {
+    avg[c] = Math.round(lessons.reduce((sum, l) => sum + (l[COMP_COLS[i]] || 0), 0) / lessons.length);
+  });
+  list.innerHTML = COMPETENCIES.map((c,i) => `
+    <div class="comp-row">
+      <div class="comp-header"><span class="comp-name">${c}</span><span class="comp-score">${avg[c]}%</span></div>
+      <div class="bar-track"><div class="bar-fill ${COMP_CLASS[i]}" style="width:${avg[c]}%"></div></div>
+    </div>`).join('');
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karol English · Painel de Alunas</title>
+<style>
+  :root {
+    --primary: #1A6B4A;
+    --primary-light: #E6FAF4;
+    --green-light: #E6FAF4;
+    --yellow-light: #FFF6E5;
+    --yellow-text: #854F0B;
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --text: #1E1E2D;
+    --muted: #8F90A6;
+    --border: #E8E9F0;
+    --shadow: 0 2px 16px rgba(108,99,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .top-bar {
+    background: var(--primary);
+    padding: 24px 28px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .top-logo { font-size: 1.5rem; }
+  .top-bar h1 { font-size: 1.2rem; font-weight: 700; }
+  .top-bar p  { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
+  .top-count  { margin-left: auto; background: rgba(255,255,255,0.18); font-size: 0.78rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; white-space: nowrap; }
+
+  .content { max-width: 820px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 10px 16px;
+    margin-bottom: 28px; box-shadow: var(--shadow);
+  }
+  .search-bar input {
+    border: none; outline: none; font-size: 0.9rem; flex: 1;
+    background: transparent; color: var(--text);
+  }
+  .search-bar input::placeholder { color: var(--muted); }
+  .search-icon { color: var(--muted); font-size: 1rem; }
+
+  .section-title {
+    font-size: 0.75rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+
+  .aluna-card {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    padding: 18px;
+    text-decoration: none;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
+    box-shadow: var(--shadow);
+  }
+  .aluna-card:hover { border-color: var(--primary); box-shadow: 0 4px 20px rgba(108,99,255,0.15); transform: translateY(-2px); }
+
+  .card-top { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    color: #fff;
+  }
+  .card-name { font-size: 0.95rem; font-weight: 700; }
+  .card-nivel { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 0.68rem; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
+  .tag-p { background: var(--primary-light); color: #0F6E56; }
+  .tag-g { background: var(--green-light); color: #0F6E56; }
+  .tag-y { background: var(--yellow-light); color: var(--yellow-text); }
+
+  .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); }
+  .card-since { font-size: 0.72rem; color: var(--muted); }
+  .arrow { color: var(--primary); font-size: 1rem; font-weight: 600; }
+
+  .empty-search { text-align: center; color: var(--muted); font-size: 0.88rem; padding: 40px 0; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     EDITE AQUI: lista de alunas
+═══════════════════════════════════════════ -->
+<script>
+  const ALUNAS = [
+    {
+      nome:    "Maria João",
+      iniciais:"MJ",
+      nivel:   "B2 · Intermediário",
+      dia:     "Terças 19h",
+      desde:   "Mar 2025",
+      cor:     "#6C63FF",   // cor do avatar
+      pasta:   "maria-joao" // nome da pasta
+    },
+    // ── Adicione mais alunas abaixo, seguindo o mesmo modelo ──
+    // {
+    //   nome:    "Ana Paula",
+    //   iniciais:"AP",
+    //   nivel:   "A2 · Iniciante",
+    //   dia:     "Quintas 18h",
+    //   desde:   "Jun 2025",
+    //   cor:     "#43C59E",
+    //   pasta:   "ana-paula"
+    // },
+  ];
+</script>
+
+<!-- ═══════════════════════════════════════════
+     Não precisa editar abaixo desta linha
+═══════════════════════════════════════════ -->
+
+<div class="top-bar">
+  <span class="top-logo">🎓</span>
+  <div>
+    <h1>Karol English</h1>
+    <p>Painel de Alunas</p>
+  </div>
+  <span class="top-count" id="count-label"></span>
+</div>
+
+<div class="content">
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="busca" placeholder="Buscar aluna..." oninput="filtrar()">
+  </div>
+
+  <div class="section-title">👩‍🎓 Alunas Ativas</div>
+  <div class="grid" id="grid"></div>
+  <p class="empty-search" id="vazio" style="display:none">Nenhuma aluna encontrada.</p>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+  function render(lista) {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    lista.forEach(a => {
+      grid.innerHTML += `
+        <a class="aluna-card" href="${a.pasta}/index.html">
+          <div class="card-top">
+            <div class="avatar" style="background:${a.cor}">${a.iniciais}</div>
+            <div>
+              <p class="card-name">${a.nome}</p>
+              <p class="card-nivel">${a.nivel}</p>
+            </div>
+          </div>
+          <div class="card-tags">
+            <span class="tag tag-y">📅 ${a.dia}</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-since">Desde ${a.desde}</span>
+            <span class="arrow">Abrir →</span>
+          </div>
+        </a>`;
+    });
+  }
+
+  function filtrar() {
+    const q = document.getElementById("busca").value.toLowerCase();
+    const filtradas = ALUNAS.filter(a => a.nome.toLowerCase().includes(q) || a.nivel.toLowerCase().includes(q));
+    render(filtradas);
+    document.getElementById("vazio").style.display = filtradas.length === 0 ? "block" : "none";
+  }
+
+  document.getElementById("count-label").textContent = ALUNAS.length + " aluna" + (ALUNAS.length !== 1 ? "s" : "");
+  document.getElementById("footer").textContent = "Atualizado em " + new Date().toLocaleDateString("pt-BR", { day:"2-digit", month:"long", year:"numeric" });
+
+  render(ALUNAS);
+</script>
+</body>
+</html>
