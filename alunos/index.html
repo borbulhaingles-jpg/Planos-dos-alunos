@@ -474,6 +474,8 @@
       </div>
       <button class="btn-add" onclick="adicionarMaterial()">+ Adicionar material</button>
     </div>
+    <div id="upload-hint" style="display:none; background:#EEF0FF; border-radius:10px; padding:12px 14px; font-size:0.8rem; line-height:1.5; margin-top:16px; color:#1E1E2D;"></div>
+
     <div class="panel-footer">
       <button class="btn-cancel-edit" onclick="fecharEditor()">Fechar</button>
       <button class="btn-download" onclick="baixarAtualizado()">⬇️ Baixar HTML atualizado</button>
@@ -564,9 +566,17 @@
   }
 
   function selecionarArquivo(inputId, pasta, fileInput) {
-    if (fileInput.files[0]) {
-      document.getElementById(inputId).value = pasta + fileInput.files[0].name;
-    }
+    if (!fileInput.files[0]) return;
+    document.getElementById(inputId).value = pasta + fileInput.files[0].name;
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const username = window.location.hostname.replace('.github.io', '');
+    const repo = parts[0];
+    const alunaFolder = parts[2] || parts[1];
+    const subFolder = pasta.replace('/', '');
+    const url = \`https://github.com/\${username}/\${repo}/upload/main/alunos/\${alunaFolder}/\${subFolder}\`;
+    const hint = document.getElementById("upload-hint");
+    hint.innerHTML = \`📤 Suba o arquivo "<strong>\${fileInput.files[0].name}</strong>" no GitHub: <a href="\${url}" target="_blank" style="color:var(--primary);word-break:break-all">\${url}</a>\`;
+    hint.style.display = "block";
   }
 
   function abrirEditor() {
