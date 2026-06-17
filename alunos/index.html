@@ -16,7 +16,7 @@
     --text: #1E1E2D;
     --muted: #8F90A6;
     --border: #E8E9F0;
-    --shadow: 0 2px 16px rgba(108,99,255,0.08);
+    --shadow: 0 2px 16px rgba(26,107,74,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -25,14 +25,21 @@
     background: var(--primary);
     padding: 24px 28px;
     color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    display: flex; align-items: center; gap: 16px;
   }
   .top-logo { font-size: 1.5rem; }
   .top-bar h1 { font-size: 1.2rem; font-weight: 700; }
   .top-bar p  { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
-  .top-count  { margin-left: auto; background: rgba(255,255,255,0.18); font-size: 0.78rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; white-space: nowrap; }
+  .top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .top-count { background: rgba(255,255,255,0.18); font-size: 0.78rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; white-space: nowrap; }
+  .btn-nova {
+    background: #fff; color: var(--primary);
+    font-size: 0.82rem; font-weight: 700;
+    padding: 8px 16px; border-radius: 20px;
+    border: none; cursor: pointer; white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .btn-nova:hover { opacity: 0.88; }
 
   .content { max-width: 820px; margin: 0 auto; padding: 32px 20px 60px; }
 
@@ -42,12 +49,8 @@
     border-radius: 12px; padding: 10px 16px;
     margin-bottom: 28px; box-shadow: var(--shadow);
   }
-  .search-bar input {
-    border: none; outline: none; font-size: 0.9rem; flex: 1;
-    background: transparent; color: var(--text);
-  }
+  .search-bar input { border: none; outline: none; font-size: 0.9rem; flex: 1; background: transparent; color: var(--text); }
   .search-bar input::placeholder { color: var(--muted); }
-  .search-icon { color: var(--muted); font-size: 1rem; }
 
   .section-title {
     font-size: 0.75rem; font-weight: 700; color: var(--muted);
@@ -59,43 +62,65 @@
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
 
   .aluna-card {
-    background: var(--card);
-    border-radius: 14px;
-    border: 1.5px solid var(--border);
-    padding: 18px;
-    text-decoration: none;
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    background: var(--card); border-radius: 14px; border: 1.5px solid var(--border);
+    padding: 18px; text-decoration: none; color: var(--text);
+    display: flex; flex-direction: column; gap: 12px;
     transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
     box-shadow: var(--shadow);
   }
-  .aluna-card:hover { border-color: var(--primary); box-shadow: 0 4px 20px rgba(108,99,255,0.15); transform: translateY(-2px); }
+  .aluna-card:hover { border-color: var(--primary); box-shadow: 0 4px 20px rgba(26,107,74,0.15); transform: translateY(-2px); }
 
   .card-top { display: flex; align-items: center; gap: 12px; }
-  .avatar {
-    width: 44px; height: 44px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1rem; font-weight: 700; flex-shrink: 0;
-    color: #fff;
-  }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; flex-shrink: 0; color: #fff; }
   .card-name { font-size: 0.95rem; font-weight: 700; }
   .card-nivel { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-
   .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
   .tag { font-size: 0.68rem; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
-  .tag-p { background: var(--primary-light); color: #0F6E56; }
-  .tag-g { background: var(--green-light); color: #0F6E56; }
   .tag-y { background: var(--yellow-light); color: var(--yellow-text); }
-
   .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); }
   .card-since { font-size: 0.72rem; color: var(--muted); }
   .arrow { color: var(--primary); font-size: 1rem; font-weight: 600; }
-
   .empty-search { text-align: center; color: var(--muted); font-size: 0.88rem; padding: 40px 0; }
-
   footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 40px; }
+
+  /* ── MODAL ── */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--card); border-radius: 18px;
+    padding: 28px; width: 100%; max-width: 460px; margin: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  }
+  .modal h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%; padding: 10px 14px; border-radius: 10px;
+    border: 1.5px solid var(--border); font-size: 0.9rem;
+    color: var(--text); background: var(--bg); outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--primary); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  .color-opt { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.15s; }
+  .color-opt:hover { transform: scale(1.15); }
+  .color-opt.selected { border-color: var(--text); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+  .btn-cancel { flex: 1; padding: 11px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 0.9rem; cursor: pointer; color: var(--muted); }
+  .btn-gerar { flex: 2; padding: 11px; border-radius: 10px; border: none; background: var(--primary); color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+  .btn-gerar:hover { opacity: 0.88; }
+
+  /* ── SUCESSO ── */
+  .success-box { display: none; background: #E6FAF4; border: 1.5px solid #43C59E; border-radius: 12px; padding: 16px 18px; margin-top: 18px; }
+  .success-box.show { display: block; }
+  .success-box p { font-size: 0.85rem; color: #0F6E56; line-height: 1.6; margin-bottom: 8px; }
+  .success-box code { background: #fff; border-radius: 6px; padding: 2px 6px; font-size: 0.8rem; color: #0F6E56; }
+  .btn-copy { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 8px; border: 1.5px solid #43C59E; background: transparent; color: #0F6E56; cursor: pointer; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -111,19 +136,10 @@
       nivel:   "B2 · Intermediário",
       dia:     "Terças 19h",
       desde:   "Mar 2025",
-      cor:     "#6C63FF",   // cor do avatar
-      pasta:   "maria-joao" // nome da pasta
+      cor:     "#6C63FF",
+      pasta:   "maria-joao"
     },
-    // ── Adicione mais alunas abaixo, seguindo o mesmo modelo ──
-    // {
-    //   nome:    "Ana Paula",
-    //   iniciais:"AP",
-    //   nivel:   "A2 · Iniciante",
-    //   dia:     "Quintas 18h",
-    //   desde:   "Jun 2025",
-    //   cor:     "#43C59E",
-    //   pasta:   "ana-paula"
-    // },
+    // Novas alunas aparecem aqui automaticamente após você baixar e enviar o arquivo
   ];
 </script>
 
@@ -137,23 +153,297 @@
     <h1>Karol English</h1>
     <p>Painel de Alunas</p>
   </div>
-  <span class="top-count" id="count-label"></span>
+  <div class="top-right">
+    <span class="top-count" id="count-label"></span>
+    <button class="btn-nova" onclick="abrirModal()">+ Nova Aluna</button>
+  </div>
 </div>
 
 <div class="content">
   <div class="search-bar">
-    <span class="search-icon">🔍</span>
+    <span>🔍</span>
     <input type="text" id="busca" placeholder="Buscar aluna..." oninput="filtrar()">
   </div>
-
   <div class="section-title">👩‍🎓 Alunas Ativas</div>
   <div class="grid" id="grid"></div>
   <p class="empty-search" id="vazio" style="display:none">Nenhuma aluna encontrada.</p>
-
   <footer id="footer"></footer>
 </div>
 
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="fecharSeOverlay(event)">
+  <div class="modal">
+    <h2>➕ Nova Aluna</h2>
+
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="f-nome" placeholder="Ex: Ana Paula Silva">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Iniciais (2 letras)</label>
+        <input type="text" id="f-iniciais" maxlength="2" placeholder="AP">
+      </div>
+      <div class="field">
+        <label>Desde (mês/ano)</label>
+        <input type="text" id="f-desde" placeholder="Jun 2025">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Nível</label>
+      <select id="f-nivel">
+        <option>A1 · Iniciante</option>
+        <option>A2 · Básico</option>
+        <option>B1 · Pré-intermediário</option>
+        <option>B2 · Intermediário</option>
+        <option>C1 · Avançado</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Dia e horário da aula</label>
+      <input type="text" id="f-dia" placeholder="Ex: Quintas 18h">
+    </div>
+
+    <div class="field">
+      <label>Cor do avatar</label>
+      <div class="color-row" id="color-row">
+        <div class="color-opt selected" style="background:#6C63FF" data-cor="#6C63FF" onclick="selecionarCor(this)"></div>
+        <div class="color-opt" style="background:#43C59E" data-cor="#43C59E" onclick="selecionarCor(this)"></div>
+        <div class="color-opt" style="background:#FF6584" data-cor="#FF6584" onclick="selecionarCor(this)"></div>
+        <div class="color-opt" style="background:#FFB830" data-cor="#FFB830" onclick="selecionarCor(this)"></div>
+        <div class="color-opt" style="background:#378ADD" data-cor="#378ADD" onclick="selecionarCor(this)"></div>
+        <div class="color-opt" style="background:#D85A30" data-cor="#D85A30" onclick="selecionarCor(this)"></div>
+        <div class="color-opt" style="background:#1A6B4A" data-cor="#1A6B4A" onclick="selecionarCor(this)"></div>
+        <div class="color-opt" style="background:#993556" data-cor="#993556" onclick="selecionarCor(this)"></div>
+      </div>
+    </div>
+
+    <div class="success-box" id="success-box">
+      <p id="success-msg"></p>
+      <button class="btn-copy" onclick="copiarLinha()">📋 Copiar link da aluna</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-gerar" onclick="gerarAluna()">⬇️ Baixar HTML da aluna</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  let corSelecionada = "#6C63FF";
+  let linhaCopia = "";
+
+  function abrirModal() {
+    document.getElementById("overlay").classList.add("open");
+    document.getElementById("success-box").classList.remove("show");
+    document.getElementById("f-nome").value = "";
+    document.getElementById("f-iniciais").value = "";
+    document.getElementById("f-desde").value = "";
+    document.getElementById("f-dia").value = "";
+  }
+  function fecharModal() { document.getElementById("overlay").classList.remove("open"); }
+  function fecharSeOverlay(e) { if (e.target.id === "overlay") fecharModal(); }
+
+  function selecionarCor(el) {
+    document.querySelectorAll(".color-opt").forEach(o => o.classList.remove("selected"));
+    el.classList.add("selected");
+    corSelecionada = el.dataset.cor;
+  }
+
+  function nomePasta(nome) {
+    return nome.toLowerCase()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim().replace(/\s+/g, "-");
+  }
+
+  function gerarAluna() {
+    const nome    = document.getElementById("f-nome").value.trim();
+    const iniciais= document.getElementById("f-iniciais").value.trim().toUpperCase();
+    const nivel   = document.getElementById("f-nivel").value;
+    const dia     = document.getElementById("f-dia").value.trim();
+    const desde   = document.getElementById("f-desde").value.trim();
+
+    if (!nome || !iniciais || !dia || !desde) {
+      alert("Preencha todos os campos antes de gerar.");
+      return;
+    }
+
+    const pasta = nomePasta(nome);
+
+    // Salva no painel automaticamente
+    const novaAluna = { nome, iniciais, nivel, dia, desde, cor: corSelecionada, pasta };
+    const salvas = JSON.parse(localStorage.getItem("alunas_extras") || "[]");
+    if (!salvas.find(a => a.pasta === pasta)) {
+      salvas.push(novaAluna);
+      localStorage.setItem("alunas_extras", JSON.stringify(salvas));
+    }
+    todasAlunas = [...ALUNAS, ...salvas];
+    document.getElementById("count-label").textContent = todasAlunas.length + " aluna" + (todasAlunas.length !== 1 ? "s" : "");
+    render(todasAlunas);
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal · ${nome}</title>
+<style>
+  :root {
+    --primary: #6C63FF;
+    --primary-light: #EEF0FF;
+    --green: #43C59E;
+    --green-light: #E6FAF4;
+    --yellow-light: #FFF6E5;
+    --yellow-text: #854F0B;
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --text: #1E1E2D;
+    --muted: #8F90A6;
+    --border: #E8E9F0;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(108,99,255,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .top-bar { background: var(--primary); padding: 22px 24px; color: #fff; display: flex; align-items: center; gap: 14px; }
+  .avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 700; flex-shrink: 0; }
+  .top-bar h1 { font-size: 1.15rem; font-weight: 700; }
+  .top-bar p { font-size: 0.8rem; opacity: 0.85; margin-top: 3px; }
+  .logo-text { margin-left: auto; font-size: 0.72rem; opacity: 0.7; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+  .content { max-width: 700px; margin: 0 auto; padding: 28px 20px 60px; }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .tag { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .tag-purple { background: var(--primary-light); color: var(--primary); }
+  .tag-green  { background: var(--green-light); color: #0F6E56; }
+  .tag-yellow { background: var(--yellow-light); color: var(--yellow-text); }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .item { background: var(--card); border-radius: 12px; border: 1.5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--text); transition: border-color 0.18s, box-shadow 0.18s; }
+  .item:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+  .item-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .item-icon.green  { background: var(--green-light); }
+  .item-icon.yellow { background: var(--yellow-light); }
+  .item-info { flex: 1; }
+  .item-name { font-size: 0.9rem; font-weight: 600; margin: 0 0 3px; }
+  .item-sub  { font-size: 0.75rem; color: var(--muted); margin: 0; }
+  .badge { font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 10px; white-space: nowrap; }
+  .badge-new  { background: var(--primary-light); color: var(--primary); }
+  .badge-done { background: var(--green-light); color: #0F6E56; }
+  .arrow { color: var(--muted); font-size: 1.1rem; font-weight: 300; flex-shrink: 0; }
+  .empty { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 20px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 40px; }
+</style>
+</head>
+<body>
+<script>
+  const ALUNO = {
+    nome:    "${nome}",
+    iniciais:"${iniciais}",
+    nivel:   "${nivel}",
+    dia_hora:"${dia}",
+    desde:   "${desde}"
+  };
+
+  const PLANOS = [
+    // { mes: "Julho 2025", data_envio: "01/07/2025", semanas: 4, status: "novo", link: "planos/julho-2025.html" },
+  ];
+
+  const AULAS_AO_VIVO = [
+    // { data: "01/07/2025", tema: "Apresentações em inglês", tipo: "pdf", link: "aulas/aula-01jul2025.pdf" },
+  ];
+
+  const MATERIAIS = [
+    // { nome: "Lista de vocabulário", tipo: "pdf", enviado: "01/07/2025", link: "materiais/vocab.pdf" },
+  ];
+<\/script>
+<div class="top-bar">
+  <div class="avatar" id="avatar"></div>
+  <div><h1 id="nome-aluno"></h1><p id="subtitulo"></p></div>
+  <span class="logo-text">Karol English</span>
+</div>
+<div class="content">
+  <div class="tags">
+    <span class="tag tag-purple" id="tag-desde"></span>
+    <span class="tag tag-green"  id="tag-nivel"></span>
+    <span class="tag tag-yellow" id="tag-aula"></span>
+  </div>
+  <div class="section">
+    <div class="section-title">📅 Planos de Estudo Mensais</div>
+    <div id="lista-planos"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🎥 Material das Aulas ao Vivo</div>
+    <div id="lista-aulas"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">📎 Materiais de Apoio</div>
+    <div id="lista-materiais"></div>
+  </div>
+  <footer id="footer"></footer>
+</div>
+<script>
+  const ICONES_TIPO = { pdf:"📄", audio:"🎧", exercicio:"📝", link:"🔗", slides:"📊" };
+  document.getElementById("avatar").textContent     = ALUNO.iniciais;
+  document.getElementById("nome-aluno").textContent = ALUNO.nome;
+  document.getElementById("subtitulo").textContent  = "Portal de Estudos · " + ALUNO.nivel;
+  document.getElementById("tag-desde").textContent  = "Desde " + ALUNO.desde;
+  document.getElementById("tag-nivel").textContent  = ALUNO.nivel;
+  document.getElementById("tag-aula").textContent   = "Aulas · " + ALUNO.dia_hora;
+  document.title = "Portal · " + ALUNO.nome;
+  const listaPl = document.getElementById("lista-planos");
+  PLANOS.length === 0 ? listaPl.innerHTML = '<p class="empty">Nenhum plano adicionado ainda.</p>' :
+    PLANOS.forEach(p => { const bc = p.status==="novo"?"badge-new":"badge-done", bl = p.status==="novo"?"Novo":p.status==="andamento"?"Em andamento":"Concluído"; listaPl.innerHTML += \`<a class="item" href="\${p.link}"><div class="item-icon">📅</div><div class="item-info"><p class="item-name">\${p.mes}</p><p class="item-sub">Enviado em \${p.data_envio} · \${p.semanas} semanas</p></div><span class="badge \${bc}">\${bl}</span><span class="arrow">›</span></a>\`; });
+  const listaAulas = document.getElementById("lista-aulas");
+  AULAS_AO_VIVO.length === 0 ? listaAulas.innerHTML = '<p class="empty">Nenhuma aula registrada ainda.</p>' :
+    AULAS_AO_VIVO.forEach(a => { listaAulas.innerHTML += \`<a class="item" href="\${a.link}" target="_blank" rel="noopener"><div class="item-icon yellow">\${ICONES_TIPO[a.tipo]||"🎥"}</div><div class="item-info"><p class="item-name">\${a.tema}</p><p class="item-sub">Aula em \${a.data} · \${a.tipo.toUpperCase()}</p></div><span class="arrow">›</span></a>\`; });
+  const listaMat = document.getElementById("lista-materiais");
+  MATERIAIS.length === 0 ? listaMat.innerHTML = '<p class="empty">Nenhum material adicionado ainda.</p>' :
+    MATERIAIS.forEach(m => { listaMat.innerHTML += \`<a class="item" href="\${m.link}" target="_blank" rel="noopener"><div class="item-icon green">\${ICONES_TIPO[m.tipo]||"📎"}</div><div class="item-info"><p class="item-name">\${m.nome}</p><p class="item-sub">\${m.tipo.toUpperCase()} · Enviado em \${m.enviado}</p></div><span class="arrow">›</span></a>\`; });
+  document.getElementById("footer").textContent = "Atualizado em " + new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
+<\/script>
+</body>
+</html>`;
+
+    // Baixar o arquivo com nome da aluna
+    const blob = new Blob([html], { type: "text/html" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url;
+    a.download = "index.html";
+    a.click();
+    URL.revokeObjectURL(url);
+
+    // Mostrar instrução
+    linhaCopia = `    {\n      nome:    "${nome}",\n      iniciais:"${iniciais}",\n      nivel:   "${nivel}",\n      dia:     "${dia}",\n      desde:   "${desde}",\n      cor:     "${corSelecionada}",\n      pasta:   "${pasta}"\n    },`;
+
+    const link = `https://borbulhaingles-jpg.github.io/Planos-dos-alunos/alunos/${pasta}/`;
+    const uploadUrl = `https://github.com/borbulhaingles-jpg/Planos-dos-alunos/upload/main/alunos/${pasta}`;
+    linhaCopia = link;
+
+    document.getElementById("success-msg").innerHTML =
+      `✅ Arquivo <strong>${pasta}.html</strong> baixado!<br><br>
+       <strong>Para subir no GitHub (2 passos):</strong><br>
+       1. <a href="${uploadUrl}" target="_blank" style="color:#0F6E56;font-weight:700">Clique aqui → abre a pasta certa no GitHub</a><br>
+       2. Arraste o arquivo <code>${pasta}.html</code> da sua pasta Downloads e clique <strong>Commit changes</strong><br><br>
+       <strong>Link para mandar para a aluna:</strong><br>
+       <code>${link}</code>`;
+    document.getElementById("success-box").classList.add("show");
+  }
+
+  function copiarLinha() {
+    navigator.clipboard.writeText(linhaCopia).then(() => {
+      document.querySelector(".btn-copy").textContent = "✅ Copiado!";
+      setTimeout(() => document.querySelector(".btn-copy").textContent = "📋 Copiar linha para o painel", 2000);
+    });
+  }
+
+  // Render
   function render(lista) {
     const grid = document.getElementById("grid");
     grid.innerHTML = "";
@@ -162,14 +452,9 @@
         <a class="aluna-card" href="${a.pasta}/index.html">
           <div class="card-top">
             <div class="avatar" style="background:${a.cor}">${a.iniciais}</div>
-            <div>
-              <p class="card-name">${a.nome}</p>
-              <p class="card-nivel">${a.nivel}</p>
-            </div>
+            <div><p class="card-name">${a.nome}</p><p class="card-nivel">${a.nivel}</p></div>
           </div>
-          <div class="card-tags">
-            <span class="tag tag-y">📅 ${a.dia}</span>
-          </div>
+          <div class="card-tags"><span class="tag tag-y">📅 ${a.dia}</span></div>
           <div class="card-footer">
             <span class="card-since">Desde ${a.desde}</span>
             <span class="arrow">Abrir →</span>
@@ -180,15 +465,16 @@
 
   function filtrar() {
     const q = document.getElementById("busca").value.toLowerCase();
-    const filtradas = ALUNAS.filter(a => a.nome.toLowerCase().includes(q) || a.nivel.toLowerCase().includes(q));
-    render(filtradas);
-    document.getElementById("vazio").style.display = filtradas.length === 0 ? "block" : "none";
+    const f = todasAlunas.filter(a => a.nome.toLowerCase().includes(q) || a.nivel.toLowerCase().includes(q));
+    render(f);
+    document.getElementById("vazio").style.display = f.length === 0 ? "block" : "none";
   }
 
-  document.getElementById("count-label").textContent = ALUNAS.length + " aluna" + (ALUNAS.length !== 1 ? "s" : "");
+  const extras = JSON.parse(localStorage.getItem("alunas_extras") || "[]");
+  let todasAlunas = [...ALUNAS, ...extras];
+  document.getElementById("count-label").textContent = todasAlunas.length + " aluna" + (todasAlunas.length !== 1 ? "s" : "");
   document.getElementById("footer").textContent = "Atualizado em " + new Date().toLocaleDateString("pt-BR", { day:"2-digit", month:"long", year:"numeric" });
-
-  render(ALUNAS);
+  render(todasAlunas);
 </script>
 </body>
 </html>
