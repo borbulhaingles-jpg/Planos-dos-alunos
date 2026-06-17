@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal · Monara</title>
+<style>
+  :root {
+    --primary: #6C63FF;
+    --primary-light: #EEF0FF;
+    --green: #43C59E;
+    --green-light: #E6FAF4;
+    --yellow-light: #FFF6E5;
+    --yellow-text: #854F0B;
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --text: #1E1E2D;
+    --muted: #8F90A6;
+    --border: #E8E9F0;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .top-bar { background: var(--primary); padding: 22px 24px; color: #fff; display: flex; align-items: center; gap: 14px; }
+  .avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 700; flex-shrink: 0; }
+  .top-bar h1 { font-size: 1.15rem; font-weight: 700; }
+  .top-bar p { font-size: 0.8rem; opacity: 0.85; margin-top: 3px; }
+  .logo-text { margin-left: auto; font-size: 0.72rem; opacity: 0.7; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+  .content { max-width: 700px; margin: 0 auto; padding: 28px 20px 60px; }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .tag { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .tag-purple { background: var(--primary-light); color: var(--primary); }
+  .tag-green  { background: var(--green-light); color: #0F6E56; }
+  .tag-yellow { background: var(--yellow-light); color: var(--yellow-text); }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .item { background: var(--card); border-radius: 12px; border: 1.5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--text); transition: border-color 0.18s; }
+  .item:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+  .item-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .item-icon.green  { background: var(--green-light); }
+  .item-icon.yellow { background: var(--yellow-light); }
+  .item-info { flex: 1; }
+  .item-name { font-size: 0.9rem; font-weight: 600; margin: 0 0 3px; }
+  .item-sub  { font-size: 0.75rem; color: var(--muted); margin: 0; }
+  .badge { font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 10px; white-space: nowrap; }
+  .badge-new  { background: var(--primary-light); color: var(--primary); }
+  .badge-done { background: var(--green-light); color: #0F6E56; }
+  .arrow { color: var(--muted); font-size: 1.1rem; flex-shrink: 0; }
+  .empty { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 20px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 40px; }
+  .btn-edit { position: fixed; bottom: 24px; right: 24px; background: var(--primary); color: #fff; border: none; border-radius: 50px; padding: 12px 20px; font-size: 0.85rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 50; }
+  .btn-edit:hover { opacity: 0.9; }
+  .edit-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px; }
+  .edit-overlay.open { display: flex; }
+  .edit-panel { background: var(--card); border-radius: 18px; width: 100%; max-width: 520px; margin: auto; padding: 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.2); }
+  .edit-panel h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tab-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 0.78rem; font-weight: 700; cursor: pointer; color: var(--muted); }
+  .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .field input, .field select { width: 100%; padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); font-size: 0.88rem; color: var(--text); background: var(--bg); outline: none; }
+  .field input:focus, .field select:focus { border-color: var(--primary); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-add { width: 100%; padding: 11px; border-radius: 10px; border: none; background: var(--primary); color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 4px; }
+  .btn-add:hover { opacity: 0.88; }
+  .divider { height: 1px; background: var(--border); margin: 18px 0; }
+  .item-list-edit { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .item-edit { background: var(--bg); border-radius: 9px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
+  .item-edit span { flex: 1; }
+  .btn-del { background: none; border: none; color: #E24B4A; cursor: pointer; font-size: 1rem; padding: 2px 6px; }
+  .panel-footer { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-cancel-edit { flex: 1; padding: 11px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 0.88rem; cursor: pointer; color: var(--muted); }
+  .btn-download { flex: 2; padding: 11px; border-radius: 10px; border: none; background: #1A6B4A; color: #fff; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
+  .btn-download:hover { opacity: 0.88; }
+  .link-row { display: flex; gap: 6px; }
+  .link-row input { flex: 1; }
+  .btn-file { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: var(--primary-light); color: var(--primary); border-radius: 9px; cursor: pointer; font-size: 1rem; flex-shrink: 0; border: 1.5px solid var(--border); }
+  .btn-file:hover { background: var(--primary); color: #fff; }
+</style>
+</head>
+<body>
+<script>
+  const ALUNO = {
+    nome:    "Monara",
+    iniciais:"MO",
+    nivel:   "A2 · Básico",
+    dia_hora:"Flexivel",
+    desde:   "JUNHO 26"
+  };
+
+  let PLANOS = [
+  ];
+
+  let AULAS_AO_VIVO = [
+  ];
+
+  let MATERIAIS = [
+  ];
+</script>
+<div class="top-bar">
+  <div class="avatar" id="avatar"></div>
+  <div><h1 id="nome-aluno"></h1><p id="subtitulo"></p></div>
+  <span class="logo-text">Karol English</span>
+</div>
+<div class="content">
+  <div class="tags">
+    <span class="tag tag-purple" id="tag-desde"></span>
+    <span class="tag tag-green"  id="tag-nivel"></span>
+    <span class="tag tag-yellow" id="tag-aula"></span>
+  </div>
+  <div class="section">
+    <div class="section-title">📅 Planos de Estudo Mensais</div>
+    <div id="lista-planos"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🎥 Material das Aulas ao Vivo</div>
+    <div id="lista-aulas"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">📎 Materiais de Apoio</div>
+    <div id="lista-materiais"></div>
+  </div>
+  <footer id="footer"></footer>
+</div>
+
+<button class="btn-edit" onclick="abrirEditor()">✏️ Editar</button>
+
+<div class="edit-overlay" id="edit-overlay" onclick="fecharSeOverlay(event)">
+  <div class="edit-panel">
+    <h2>✏️ Editar portal — <span id="edit-nome"></span></h2>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="mudarTab('planos', this)">📅 Planos</button>
+      <button class="tab-btn" onclick="mudarTab('aulas', this)">🎥 Aulas</button>
+      <button class="tab-btn" onclick="mudarTab('materiais', this)">📎 Materiais</button>
+    </div>
+    <div class="tab-content active" id="tab-planos">
+      <div class="item-list-edit" id="list-planos"></div>
+      <div class="divider"></div>
+      <div class="field"><label>Mês</label><input id="p-mes" placeholder="Ex: Julho 2025"></div>
+      <div class="field-row">
+        <div class="field"><label>Data de envio</label><input id="p-data" placeholder="01/07/2025"></div>
+        <div class="field"><label>Semanas</label><input id="p-semanas" type="number" value="4" min="1" max="6"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Status</label>
+          <select id="p-status"><option value="novo">Novo</option><option value="andamento">Em andamento</option><option value="concluido">Concluído</option></select>
+        </div>
+        <div class="field"><label>Link do arquivo</label>
+          <div class="link-row"><input id="p-link" placeholder="planos/julho-2025.html"><label class="btn-file" for="p-file" title="Selecionar arquivo">📁</label><input type="file" id="p-file" style="display:none" onchange="selecionarArquivo('p-link','planos/',this)"></div>
+        </div>
+      </div>
+      <button class="btn-add" onclick="adicionarPlano()">+ Adicionar plano</button>
+    </div>
+    <div class="tab-content" id="tab-aulas">
+      <div class="item-list-edit" id="list-aulas"></div>
+      <div class="divider"></div>
+      <div class="field"><label>Tema da aula</label><input id="a-tema" placeholder="Ex: Present Perfect"></div>
+      <div class="field-row">
+        <div class="field"><label>Data da aula</label><input id="a-data" placeholder="10/07/2025"></div>
+        <div class="field"><label>Tipo</label>
+          <select id="a-tipo"><option value="pdf">PDF</option><option value="slides">Slides</option><option value="exercicio">Exercício</option><option value="link">Link</option></select>
+        </div>
+      </div>
+      <div class="field"><label>Link do arquivo</label>
+        <div class="link-row"><input id="a-link" placeholder="aulas/aula-10jul2025.pdf"><label class="btn-file" for="a-file" title="Selecionar arquivo">📁</label><input type="file" id="a-file" style="display:none" onchange="selecionarArquivo('a-link','aulas/',this)"></div>
+      </div>
+      <button class="btn-add" onclick="adicionarAula()">+ Adicionar aula</button>
+    </div>
+    <div class="tab-content" id="tab-materiais">
+      <div class="item-list-edit" id="list-materiais"></div>
+      <div class="divider"></div>
+      <div class="field"><label>Nome do material</label><input id="m-nome" placeholder="Ex: Lista de vocabulário"></div>
+      <div class="field-row">
+        <div class="field"><label>Tipo</label>
+          <select id="m-tipo"><option value="pdf">PDF</option><option value="audio">Áudio</option><option value="exercicio">Exercício</option><option value="link">Link</option></select>
+        </div>
+        <div class="field"><label>Data de envio</label><input id="m-data" placeholder="10/07/2025"></div>
+      </div>
+      <div class="field"><label>Link do arquivo</label>
+        <div class="link-row"><input id="m-link" placeholder="materiais/vocab.pdf"><label class="btn-file" for="m-file" title="Selecionar arquivo">📁</label><input type="file" id="m-file" style="display:none" onchange="selecionarArquivo('m-link','materiais/',this)"></div>
+      </div>
+      <button class="btn-add" onclick="adicionarMaterial()">+ Adicionar material</button>
+    </div>
+    <div id="upload-hint" style="display:none; background:#EEF0FF; border-radius:10px; padding:12px 14px; font-size:0.8rem; line-height:1.5; margin-top:16px; color:#1E1E2D;"></div>
+
+    <div class="panel-footer">
+      <button class="btn-cancel-edit" onclick="fecharEditor()">Fechar</button>
+      <button class="btn-download" onclick="baixarAtualizado()">⬇️ Baixar HTML atualizado</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ICONES_TIPO = { pdf:"📄", audio:"🎧", exercicio:"📝", link:"🔗", slides:"📊" };
+
+  function renderPortal() {
+    document.getElementById("avatar").textContent     = ALUNO.iniciais;
+    document.getElementById("nome-aluno").textContent = ALUNO.nome;
+    document.getElementById("subtitulo").textContent  = "Portal de Estudos · " + ALUNO.nivel;
+    document.getElementById("tag-desde").textContent  = "Desde " + ALUNO.desde;
+    document.getElementById("tag-nivel").textContent  = ALUNO.nivel;
+    document.getElementById("tag-aula").textContent   = "Aulas · " + ALUNO.dia_hora;
+    document.title = "Portal · " + ALUNO.nome;
+    const listaPl = document.getElementById("lista-planos");
+    listaPl.innerHTML = PLANOS.length === 0 ? '<p class="empty">Nenhum plano adicionado ainda.</p>' : "";
+    PLANOS.forEach(p => { const bc = p.status==="novo"?"badge-new":"badge-done", bl = p.status==="novo"?"Novo":p.status==="andamento"?"Em andamento":"Concluído"; listaPl.innerHTML += `<a class="item" href="${p.link}"><div class="item-icon">📅</div><div class="item-info"><p class="item-name">${p.mes}</p><p class="item-sub">Enviado em ${p.data_envio} · ${p.semanas} semanas</p></div><span class="badge ${bc}">${bl}</span><span class="arrow">›</span></a>`; });
+    const listaAulas = document.getElementById("lista-aulas");
+    listaAulas.innerHTML = AULAS_AO_VIVO.length === 0 ? '<p class="empty">Nenhuma aula registrada ainda.</p>' : "";
+    AULAS_AO_VIVO.forEach(a => { listaAulas.innerHTML += `<a class="item" href="${a.link}" target="_blank" rel="noopener"><div class="item-icon yellow">${ICONES_TIPO[a.tipo]||"🎥"}</div><div class="item-info"><p class="item-name">${a.tema}</p><p class="item-sub">Aula em ${a.data} · ${a.tipo.toUpperCase()}</p></div><span class="arrow">›</span></a>`; });
+    const listaMat = document.getElementById("lista-materiais");
+    listaMat.innerHTML = MATERIAIS.length === 0 ? '<p class="empty">Nenhum material adicionado ainda.</p>' : "";
+    MATERIAIS.forEach(m => { listaMat.innerHTML += `<a class="item" href="${m.link}" target="_blank" rel="noopener"><div class="item-icon green">${ICONES_TIPO[m.tipo]||"📎"}</div><div class="item-info"><p class="item-name">${m.nome}</p><p class="item-sub">${m.tipo.toUpperCase()} · Enviado em ${m.enviado}</p></div><span class="arrow">›</span></a>`; });
+    document.getElementById("footer").textContent = "Atualizado em " + new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
+  }
+
+  function renderListas() {
+    document.getElementById("list-planos").innerHTML = PLANOS.map((p,i) =>
+      `<div class="item-edit"><span>📅 ${p.mes} · ${p.status}</span><button class="btn-del" onclick="remover('planos',${i})">✕</button></div>`).join("") || '<p style="color:var(--muted);font-size:0.8rem">Nenhum plano ainda.</p>';
+    document.getElementById("list-aulas").innerHTML = AULAS_AO_VIVO.map((a,i) =>
+      `<div class="item-edit"><span>🎥 ${a.data} · ${a.tema}</span><button class="btn-del" onclick="remover('aulas',${i})">✕</button></div>`).join("") || '<p style="color:var(--muted);font-size:0.8rem">Nenhuma aula ainda.</p>';
+    document.getElementById("list-materiais").innerHTML = MATERIAIS.map((m,i) =>
+      `<div class="item-edit"><span>📎 ${m.nome}</span><button class="btn-del" onclick="remover('materiais',${i})">✕</button></div>`).join("") || '<p style="color:var(--muted);font-size:0.8rem">Nenhum material ainda.</p>';
+  }
+
+  function remover(tipo, i) {
+    if (tipo==="planos") PLANOS.splice(i,1);
+    else if (tipo==="aulas") AULAS_AO_VIVO.splice(i,1);
+    else MATERIAIS.splice(i,1);
+    renderListas(); renderPortal();
+  }
+
+  function adicionarPlano() {
+    const mes = document.getElementById("p-mes").value.trim();
+    const data = document.getElementById("p-data").value.trim();
+    const link = document.getElementById("p-link").value.trim();
+    if (!mes || !data || !link) { alert("Preencha todos os campos."); return; }
+    PLANOS.unshift({ mes, data_envio: data, semanas: parseInt(document.getElementById("p-semanas").value)||4, status: document.getElementById("p-status").value, link });
+    document.getElementById("p-mes").value = "";
+    document.getElementById("p-data").value = "";
+    document.getElementById("p-link").value = "";
+    renderListas(); renderPortal();
+  }
+
+  function adicionarAula() {
+    const tema = document.getElementById("a-tema").value.trim();
+    const data = document.getElementById("a-data").value.trim();
+    const link = document.getElementById("a-link").value.trim();
+    if (!tema || !data || !link) { alert("Preencha todos os campos."); return; }
+    AULAS_AO_VIVO.unshift({ data, tema, tipo: document.getElementById("a-tipo").value, link });
+    document.getElementById("a-tema").value = "";
+    document.getElementById("a-data").value = "";
+    document.getElementById("a-link").value = "";
+    renderListas(); renderPortal();
+  }
+
+  function adicionarMaterial() {
+    const nome = document.getElementById("m-nome").value.trim();
+    const data = document.getElementById("m-data").value.trim();
+    const link = document.getElementById("m-link").value.trim();
+    if (!nome || !data || !link) { alert("Preencha todos os campos."); return; }
+    MATERIAIS.unshift({ nome, tipo: document.getElementById("m-tipo").value, enviado: data, link });
+    document.getElementById("m-nome").value = "";
+    document.getElementById("m-data").value = "";
+    document.getElementById("m-link").value = "";
+    renderListas(); renderPortal();
+  }
+
+  function mudarTab(id, btn) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-"+id).classList.add("active");
+  }
+
+  function selecionarArquivo(inputId, pasta, fileInput) {
+    if (!fileInput.files[0]) return;
+    document.getElementById(inputId).value = pasta + fileInput.files[0].name;
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const username = window.location.hostname.replace('.github.io', '');
+    const repo = parts[0];
+    const alunaFolder = parts[2] || parts[1];
+    const subFolder = pasta.replace('/', '');
+    const url = `https://github.com/${username}/${repo}/upload/main/alunos/${alunaFolder}/${subFolder}`;
+    const hint = document.getElementById("upload-hint");
+    hint.innerHTML = `📤 Suba o arquivo "<strong>${fileInput.files[0].name}</strong>" no GitHub: <a href="${url}" target="_blank" style="color:var(--primary);word-break:break-all">${url}</a>`;
+    hint.style.display = "block";
+  }
+
+  function abrirEditor() {
+    document.getElementById("edit-nome").textContent = ALUNO.nome;
+    renderListas();
+    document.getElementById("edit-overlay").classList.add("open");
+  }
+  function fecharEditor() { document.getElementById("edit-overlay").classList.remove("open"); }
+  function fecharSeOverlay(e) { if (e.target.id==="edit-overlay") fecharEditor(); }
+
+  function baixarAtualizado() {
+    const planosJSON    = JSON.stringify(PLANOS, null, 4);
+    const aulasJSON     = JSON.stringify(AULAS_AO_VIVO, null, 4);
+    const materiaisJSON = JSON.stringify(MATERIAIS, null, 4);
+    const html = document.documentElement.outerHTML
+      .replace(/let PLANOS = \[[\s\S]*?\];/, "let PLANOS = " + planosJSON + ";")
+      .replace(/let AULAS_AO_VIVO = \[[\s\S]*?\];/, "let AULAS_AO_VIVO = " + aulasJSON + ";")
+      .replace(/let MATERIAIS = \[[\s\S]*?\];/, "let MATERIAIS = " + materiaisJSON + ";");
+    const blob = new Blob([html], { type: "text/html" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "index.html"; a.click(); URL.revokeObjectURL(a.href);
+  }
+
+  renderPortal();
+</script>
+</body>
+</html>
