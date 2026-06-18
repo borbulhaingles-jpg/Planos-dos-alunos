@@ -52,7 +52,7 @@
   footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 40px; }
 
   /* BOTÃO EDITAR */
-  .btn-edit { position: fixed; bottom: 24px; right: 24px; background: var(--primary); color: #fff; border: none; border-radius: 50px; padding: 12px 20px; font-size: 0.85rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(108,99,255,0.35); z-index: 50; }
+  .btn-edit { display: none; position: fixed; bottom: 24px; right: 24px; background: var(--primary); color: #fff; border: none; border-radius: 50px; padding: 12px 20px; font-size: 0.85rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(108,99,255,0.35); z-index: 50; }
   .btn-edit:hover { opacity: 0.9; }
 
   /* PAINEL DE EDIÇÃO */
@@ -333,6 +333,8 @@
   }
 
   function abrirEditor() {
+    const senha = prompt("Digite a senha:");
+    if (senha !== "159753") { alert("Senha incorreta."); return; }
     document.getElementById("edit-nome").textContent = ALUNO.nome;
     renderListas();
     document.getElementById("edit-overlay").classList.add("open");
@@ -356,6 +358,7 @@
   }
 
   renderPortal();
+  if (window.location.search.includes('admin')) document.querySelector('.btn-edit').style.display = 'block';
 </script>
 </body>
 </html>

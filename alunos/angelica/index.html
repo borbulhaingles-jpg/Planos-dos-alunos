@@ -288,6 +288,8 @@
   }
 
   function abrirEditor() {
+    const senha = prompt("Digite a senha:");
+    if (senha !== "159753") { alert("Senha incorreta."); return; }
     document.getElementById("edit-nome").textContent = ALUNO.nome;
     renderListas();
     document.getElementById("edit-overlay").classList.add("open");
